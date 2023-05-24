@@ -11,21 +11,12 @@ typedef struct{
     int8_t position;
 } pieza;
 
-#define HARDWARE_TYPE MD_MAX72XX::FC16_HW
-#define MAX_DEVICES 4
-#define CLK_PIN 13   // or SCK
-#define DATA_PIN 11  // or MOSI
-#define CS_PIN 10    // or SS
-
 #define ROW_SIZE 8  // tamaño del modulo
 #define COL_SIZE (MAX_DEVICES * ROW_SIZE)
 
-#define KEY 4
-#define JOYx A0
-#define JOYy A1
-
-MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
-
+void MD_MAX72XX_setup(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES){
+    MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
+}
 
 unsigned long react_time = 50; // miliseconds
 
@@ -170,6 +161,17 @@ void cursor_move(uint8_t x, uint8_t y) {
   cursor.y = y;
 }
 
+//Modos
+
+void mode_inicio() {
+    PANTALLA_INICIO[0];
+}
+
+void mode_jugar(){
+    CUADRADO_JUEGO[0];
+    
+    
+}
 
 /*
 Copia en la pantalla la memoria local Screen
@@ -186,6 +188,8 @@ void print_screen() {
 }
 
 void setup() {
+    mode_inicio();
+
   Serial.begin(115200);
 
   MD_setup();
@@ -197,20 +201,9 @@ void setup() {
 
 //Loop por modificar entero, solo para referencia
 void loop() {
-  
-  if(movimiento){
-    mode_mov();
-  }else{
-    if(pintar){
-      mode_pint();
-    }else{
-      mode_borr();
+    if(KEY_read()){
+        mode_jugar();
     }
-  }
-
-  if(KEY_read()){
-    cursor_change();
-  }
 
   curs change = joystick();
 
