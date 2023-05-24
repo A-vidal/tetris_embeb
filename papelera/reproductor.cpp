@@ -75,7 +75,7 @@ void Track::play() {
   if (elong_left < 1) {
     nota_actual = m_melody[step];
 
-    if (nota_actual.elongacion = 0)  // fin de melodia -> Repetir Bucle
+    if (nota_actual.elongacion == 0)  // fin de melodia -> Repetir Bucle
     {
       step = 0;
       nota_actual = m_melody[step];
