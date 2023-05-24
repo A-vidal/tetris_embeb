@@ -1,0 +1,196 @@
+class Track {
+  uint8_t elong_left = 0;
+  uint8_t step = 0;
+  note nota_actual;
+
+  public:
+
+  int m_pin;
+  const note *m_melody;
+
+  Track(int pin, const note *melody) {
+    m_pin = pin;
+    m_melody = melody;
+  };
+
+  void test(int freq) {
+    static bool tone_state;
+    if (tone_state) {
+      tone_state = false;
+      noTone(m_pin);
+    } else {
+      tone_state = true;
+      tone(m_pin, freq);
+    }
+  };
+
+  void play() {
+    if (elong_left < 1) {
+      nota_actual = m_melody[step];
+
+      Serial.print((unsigned long)m_melody, HEX);
+      Serial.print("; ");
+      Serial.print((unsigned long)tema_principal, HEX);
+      Serial.print("; ");
+      Serial.print(step);
+      Serial.print("; ");
+      Serial.print(nota_actual.nota);
+      Serial.print(", ");
+      Serial.print(nota_actual.tesitura);
+      Serial.print(", ");
+      Serial.println(nota_actual.elongacion);
+
+      elong_left = nota_actual.elongacion;
+
+      if (elong_left = 0)  // fin de melodia -> Repetir Bucle
+      {
+        step = 0;
+        nota_actual = m_melody[step];
+        elong_left = nota_actual.elongacion;
+      }
+
+      if (nota_actual.tesitura > 0)  // Nota
+      {
+        // unsigned long duracion = player_period * elong_left;
+        int freq = nota_to_freq(nota_actual.nota, nota_actual.tesitura);
+        tone(m_pin, freq);
+        // tone(pin, freq, duracion);
+      } else  // Silencio
+      {
+        noTone(m_pin);
+      }
+
+      step++;
+
+    } else {
+      elong_left--;
+    }
+  };
+
+  void stop() {
+    noTone(m_pin);
+    elong_left = 0;
+    step = 0;
+  };
+};
+
+class Player {
+  unsigned long prev_time;
+
+public:
+
+  uint8_t traks_len;
+  uint8_t current_track;
+
+  uint8_t BPM;
+  int8_t subdivision;
+  unsigned long t_interval;
+
+  Track *traks;
+
+  void change_BPM(uint8_t BPM) {
+    this->BPM = BPM;
+    if (subdivision > 0)
+      this->t_interval = (60000 / BPM) >> subdivision;
+    else
+      this->t_interval = (60000 / BPM) << subdivision;
+  };
+
+  /*
+    number_traks: numero de reproducciones en paralelo
+    BPM: beats por minuto (velocidad de reproduccion)
+    subdivision: multiplicador de la nota por defecto "negra" (potencia de 2 negativa)
+    */
+  Player(uint8_t numbrer_traks, uint8_t BPM, int8_t subdivision) {
+    this->traks[numbrer_traks];
+    traks_len = numbrer_traks;
+
+    this->subdivision = subdivision;
+
+    change_BPM(BPM);
+  };
+
+  void add_track(uint8_t pin, const note *melody) {
+    if (current_track < traks_len) {
+      traks[current_track] = Track(pin, melody);
+      current_track++;
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  void test(unsigned long period = (60000 / 140)) {
+    static unsigned long prev;
+
+    unsigned long time = millis();
+
+    if (time - prev >= period) {
+      prev = time;
+
+      for (uint8_t i = 0; i <= current_track; i++) {
+        traks[i].test(440);
+      }
+    }
+  };
+
+  void play() {
+    unsigned long time = millis();
+
+    if (time - prev_time >= t_interval) {
+      prev_time = time;
+
+      for (uint8_t i = 0; i <= current_track; i++) {
+        traks[i].play();
+      }
+    }
+  };
+
+  void stop() {
+    for (uint8_t i = 0; i < current_track; i++) {
+      traks[i].stop();
+    }
+    this->prev_time = 0;
+  };
+};
+/*
+void music_player(){
+
+    unsigned long time = millis();
+
+    static unsigned long prev_time = 0;
+
+    if (time - prev_time >= player_period) {
+        prev_time = time;
+
+        //reproducer();// falta cambiar
+
+    }
+}
+
+void reproducer(int pin, note *melody, uint8_t length){
+
+    static uint8_t elong_left = 0;
+
+    static uint8_t step = 0;
+
+    if(elong_left < 1){
+        note nota_actual = melody[step];
+
+        elong_left = nota_actual.elongacion;
+
+        if(nota_actual.tesitura > 0){
+            int duracion = player_period * elong_left;
+            int freq = nota_to_freq(nota_actual.nota, nota_actual.tesitura);
+            
+            tone(pin, freq, duracion);
+        }else{
+            noTone(pin);
+        }
+
+        step = (++step) % length;
+    }else{
+        elong_left--;
+    }
+}
+*/
