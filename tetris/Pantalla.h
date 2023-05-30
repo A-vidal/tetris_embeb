@@ -41,26 +41,6 @@ void MD_setup() {
   resetMD();
 }
 
-void joy_setup() {
-  pinMode(KEY, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(KEY), KEY_interr, RISING);
-}
-
-bool KEY_read() {
-  return digitalRead(KEY) == LOW;
-}
-
-void KEY_interr(){
-  static unsigned long previous = 0;
-  unsigned long time = millis();
-
-  if(time - previous >= react_time){
-    cursor_change();
-
-    previous = time;
-  }
-}
-
 uint8_t joy_interr(uint8_t input, int value){
   static unsigned long previous = 0;
   unsigned long time = millis();

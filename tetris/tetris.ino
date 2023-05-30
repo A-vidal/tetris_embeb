@@ -14,6 +14,8 @@
 
 const int pinZumb = 8;
 
+uint8_t FPS = 15 // Ejecuciones de la pantalla por segundo
+
 void setup()
 {
   Serial.begin(115200);
