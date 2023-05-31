@@ -1,6 +1,7 @@
 #include "musica.h"
 #include "reproductor.h"
 #include "Pantalla.h"
+#include "controles.h"
 
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
 #define MAX_DEVICES 4
