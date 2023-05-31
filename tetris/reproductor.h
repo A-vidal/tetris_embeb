@@ -124,7 +124,7 @@ void rep_play(){
 };
 
 
-void stop(){
+void rep_stop(){
   noTone(rep.pin);
   rep.player.elong_left = 0;
   rep.player.step = 0;
