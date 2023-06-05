@@ -9,7 +9,7 @@ typedef struct {
   bool pulsar;
 } Cursor ;
 
-Cursor cursor
+Cursor cursor;
 
 bool KEY_read() {
   return (digitalRead(KEY) == LOW);
@@ -28,7 +28,7 @@ int JOYx_read(){
 }
 
 bool JOYy_read(){
-  return analogRead(cursor.JOYy) > 600;
+  return analogRead(JOYy) > 600;
 }
 
 void joy_setup() {
@@ -39,6 +39,18 @@ void informacion(){
   cursor.direccion += JOYx_read();
   cursor.doble = cursor.doble || JOYy_read();
   cursor.pulsar = cursor.pulsar || KEY_read();
+}
+
+bool get_KEY(){
+  return cursor.pulsar;
+}
+
+bool get_JOYy(){
+  return cursor.doble;
+}
+
+int get_JOYx(){
+  return cursor.direccion;
 }
 
 #endif

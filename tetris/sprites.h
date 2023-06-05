@@ -5,6 +5,12 @@
 
 typedef uint8_t sprite[3];
 
+void copiar_sprite(sprite * out, const sprite * in){
+  for(uint8_t k = 0; k < 3; k++){
+    *out[k] = *in[k];
+  }
+}
+
 const uint8_t PANTALLA_INICIO[32] = {
     //Dibujo inicial 8x32
     0b01110000,
