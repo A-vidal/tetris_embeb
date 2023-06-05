@@ -42,7 +42,7 @@ const uint8_t PANTALLA_INICIO[32] = {
     0b00000000,
     0b00000000,
     0b00000000,
-}
+};
 
 const uint8_t CUADRADO_JUEGO[8] = {
     0b11111111,
@@ -53,7 +53,7 @@ const uint8_t CUADRADO_JUEGO[8] = {
     0b10000001,
     0b10000001,
     0b11111111,
-}
+};
 
 const sprite PIEZAS[4][7] = {
     { // orientacion 0
@@ -204,6 +204,6 @@ const sprite PIEZAS[4][7] = {
             0b00001100,
         }
     }
-}
+};
 
 #endif

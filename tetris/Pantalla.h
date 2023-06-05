@@ -5,27 +5,10 @@
 #include "sprites.h"
 #include <MD_MAX72xx.h>
 
-
-typedef struct{
-    unsigned HARDWARE_TYPE state;
-    unsigned DATA_PIN state;
-    unsigned CLK_PIN state;
-    unsigned CS_PIN state;
-    unsigned MAX_DEVICES state;
-    unsigned long react_time = 50;//miliseconds
-} Pantalla;
-
-Pantalla pantalla
-
 #define ROW_SIZE 8  // tamaño del modulo
 #define COL_SIZE (MAX_DEVICES * ROW_SIZE)
 
-//Ajustes pantalla
-void MD_MAX72XX_setup(pantalla.HARDWARE_TYPE, pantalla.DATA_PIN, pantalla.CLK_PIN, pantalla.CS_PIN, pantalla.MAX_DEVICES){
-    MD_MAX72XX mx = MD_MAX72XX(pantalla.HARDWARE_TYPE, pantalla.DATA_PIN, pantalla.CLK_PIN, pantalla.CS_PIN, pantalla.MAX_DEVICES);
-}
-
-uint8_t screen[COL_SIZE];
+MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
 
 //Limpiar pantalla
 void resetMD() {
@@ -40,22 +23,43 @@ void MD_setup() {
   resetMD();
 }
 
-//Modos
+// Funciones
 
-void mode_inicio() {
-    PANTALLA_INICIO[0];
-
+uint8_t leer_fila(uint8_t i){
+  return mx.getColumn(i);
 }
 
-void mode_jugar(){
-    CUADRADO_JUEGO[0];
-    
-    
+void escribir_fila(uint8_t i, uint8_t value){
+  mx.setColumn(i, value);
 }
 
-void setup() {
-  MD_setup()
-  mode_inicio();
+void escribir_sprite(uint8_t i, sprite form){
+  mx.setColumn(i+1, form[0]);
+  mx.setColumn(i, form[1]);
+  if (i>0)
+    mx.setColumn(i-1, form[2]);
+}
+
+void borrar_sprite(uint8_t i, sprite form){
+  for(uint8_t k= 0; k < 3, k++){
+    form[k] = form[k] ^ 0b11111111
+  }
+  mx.setColumn(i+1, form[0]);
+  mx.setColumn(i, form[1]);
+  if (i>0)
+    mx.setColumn(i-1, form[2]);
+}
+
+void barrido_pantalla(uint8_t i, uint8_t max){
+  uint8_t value;
+  for(uint8_t k = i; k < max; k++){
+    if (k + 1 == max){
+      value = 0
+    }else{
+      value = mx.getColumn(k);
+    }
+    mx.setColumn(k, value);
+  }
 }
 
 #endif

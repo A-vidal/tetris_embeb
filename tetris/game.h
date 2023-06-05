@@ -1,19 +1,20 @@
-#include <stdint.h>
 #ifndef GAME
 #define GAME
 
+#include <stdint.h>
 #include "Arduino.h"
 #include "sprites.h"
 
 enum game_fase{
   NEW_PIECE, MOVEMENT, CHECKOUT, FALL
-}
+};
 
 typedef struct {
   sprite form;
   int8_t pos_x; // posicion % 8
   uint8_t pos_y; // posicion % map_size
   uint8_t rot; // rotacion % 4
+  uint8_t num; // numero de pieza [0-6]
 } Pieza;
 
 typedef struct {
@@ -45,13 +46,13 @@ void game_change_FPS(uint8_t FPS){
 bool game_check_x_mov(sprite box, bool right){
   bool retorn = true;
 
-  if (rignt) { // derecha
-    for (uint8_t i = 0; i < 3, i++){
-      retorn = retorn && ((box[i] % 2) == 0)
+  if (right) { // derecha
+    for (uint8_t i = 0; i < 3; i++){
+      retorn = retorn && ((box[i] % 2) == 0);
     }
   } else { // izquierda
-    for (uint8_t i = 0; i < 3, i++){
-      retorn = retorn && (box[i] < 128)
+    for (uint8_t i = 0; i < 3; i++){
+      retorn = retorn && (box[i] < 128);
     }
   }
   
@@ -59,18 +60,18 @@ bool game_check_x_mov(sprite box, bool right){
 }
 
 sprite game_x_mov(Pieza *box){
-  sprite retorn = box->form;
+  sprite retorn = PIEZAS[box->rot][box->num];
 
   uint8_t i;
   uint8_t j;
 
-  if (x > 0) 
+  if (box->pos_x > 0) 
   {
-    for (i = 0; i < x, i++)
+    for (i = 0; i < box->pos_x; i++)
     {
       if (game_check_x_mov(retorn, true))
       { // mover el sprite
-        for (j = 0; j < 3, j++){
+        for (j = 0; j < 3; j++){
           retorn = retorn >> 1; 
         }
       }else
@@ -81,11 +82,11 @@ sprite game_x_mov(Pieza *box){
     }
   } else 
   {
-    for (uint8_t i = 0; i > x, i--)
+    for (i = 0; i > box->pos_x; i--)
     {
       if (game_check_x_mov(retorn, false))
       { // mover el sprite
-        for (j = 0; j < 3, j++){
+        for (j = 0; j < 3; j++){
           retorn = retorn << 1; 
         }
       }else
@@ -95,6 +96,7 @@ sprite game_x_mov(Pieza *box){
       }
     }
   }
+  return retorn;
 }
 
 bool game_check_hitbox(Pieza *hitbox){
@@ -102,7 +104,7 @@ bool game_check_hitbox(Pieza *hitbox){
 
   uint8_t pos_y = hitbox->pos_y;
 
-  bool retorn = true
+  bool retorn = true;
 
   if(0 == pos_y)
   {
@@ -127,13 +129,13 @@ bool game_check_hitbox(Pieza *hitbox){
 
     retorn = retorn && ((game_map[pos_y - 1] & box[2]) == 0);
   }
-}
 
-void gameover(){}
+  return retorn;
+}
 
 // ======================================================================
 
-void game_new_peace(){
+bool game_new_piece(){
   Pieza *pieza = &game.pieza;
   Pieza *hitbox = &game.hitbox;
 
@@ -141,31 +143,94 @@ void game_new_peace(){
 
   hitbox->rot = 0;
   hitbox->pos_x = 0;
-  hitbox->pos_y = game.map_size - 1;
+  hitbox->pos_y = game.map_size - 2;
 
-  hitbox->form = forma
+  hitbox->form = forma;
 
   if (game_check_hitbox(hitbox)){
-    gameover();
+    pieza = *hitbox;
+    // map_print()
+    game_map[pieza->pos_y + 1] = pieza->form[0];
+    game_map[pieza->pos_y ] = pieza->form[1];
+    game_map[pieza->pos_y - 1] = pieza->form[2];
+  }
+  else{
+    return false; // GAME OVER
+  }
+  game.state = MOVEMENT;
+}
+
+void game_movement(unsigned input){
+  Pieza *pieza = &game.pieza;
+  Pieza *hitbox = &game.hitbox;
+
+  // por rellenar
+
+  if(game_check_hitbox(hitbox)){
+
+  }else{
+    if(input){
+      // por rellenar
+    }else{
+      game.state = CHECKOUT;
+    }
+  }
+}
+
+void game_checkout(){
+  for(uint8_t i = 0; i < game.map_size; i++){
+    if(game_map[i] == 0b11111111)
+    {
+      game_map[i] = 0;
+
+      game.state = FALL;
+      return;
+    }
+  }
+  game.state = NEW_PIECE;
+}
+
+void game_fall(){
+  game.state = CHECKOUT;
+  for(uint8_t i = 0; i < game.map_size; i++){
+    if(game_map[i] == 0)
+    {
+      barrido_pantalla(i, game.map_size);
+      break;
+    }
   }
 }
 
 // ======================================================================
 
-void game_play(unsigned input){
+bool game_play(unsigned input){
   static unsigned long prev = 0;
   unsigned long time = millis();
 
   if(time - prev >= game.inv_fps){
     prev = time;
 
-    switch (game.fase) {
-      case NEW_PIECE:
-        game_new_peace();
+    switch (game.state) {
+      case CHECKOUT:
+        game_checkout();
         break;
-      case DIRECTION:
-        
+
+      case FALL:
+        game_fall();
+        break;
+
+      case MOVEMENT:
+        game_movement();
+        break;
+
+      case NEW_PIECE:
+        return game_new_piece();
+        break;
+
+      default:
+        game_checkout();
     }
+    return true;
   }
 }
 
