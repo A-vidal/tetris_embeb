@@ -55,7 +55,6 @@ bool game_check_x_mov(sprite box, bool right){
       retorn = retorn && (box[i] < 128);
     }
   }
-  
   return retorn;
 }
 
@@ -101,7 +100,7 @@ bool game_check_hitbox(Pieza *hitbox){
 
   sprite box;
 
-  copiar_sprite(&box, &hitbox->form);
+  copiar_sprite(&box, &(hitbox->form));
 
   uint8_t pos_y = hitbox->pos_y;
 
@@ -110,24 +109,18 @@ bool game_check_hitbox(Pieza *hitbox){
   if(0 == pos_y)
   {
     retorn = retorn && ((leer_fila(1) & box[0]) == 0);
-
     retorn = retorn && ((leer_fila(0) & box[1]) == 0);
-
     retorn = retorn && (box[2] == 0);
   }
   else if (game.map_size - 1 == pos_y)
   {
     retorn = retorn && (box[0] == 0);
-
     retorn = retorn && ((leer_fila(game.map_size)     & box[0]) == 0);
-
     retorn = retorn && ((leer_fila(game.map_size - 1) & box[2]) == 0);
   }
   else{
     retorn = retorn && ((leer_fila(pos_y + 1) & box[0]) == 0);
-
     retorn = retorn && ((leer_fila(pos_y)     & box[1]) == 0);
-
     retorn = retorn && ((leer_fila(pos_y - 1) & box[2]) == 0);
   }
 
@@ -137,20 +130,15 @@ bool game_check_hitbox(Pieza *hitbox){
 // ======================================================================
 
 bool game_new_piece(){
-  Pieza *hitbox;
-  Pieza *pieza;
-
-  hitbox = &game.hitbox;
-  pieza = &game.pieza;
 
   if(game.next != 7){
 
     borrar_sprite(27, PIEZAS[0][game.next]);
 
-    copiar_sprite(&hitbox->form, &PIEZAS[0][game.next]);
+    copiar_sprite(&(game.hitbox.form), &PIEZAS[0][game.next]);
 
   }else{
-    copiar_sprite(&hitbox->form, &PIEZAS[0][random(7)]);
+    copiar_sprite(&(game.hitbox.form), &PIEZAS[0][random(7)]);
   }
 
   game.next = random(7);
@@ -158,14 +146,14 @@ bool game_new_piece(){
   escribir_sprite(27, PIEZAS[0][game.next]);
 
   // preparar la hitbox
-  hitbox->rot = 0;
-  hitbox->pos_x = 0;
-  hitbox->pos_y = game.map_size - 2;
+  game.hitbox.rot = 0;
+  game.hitbox.pos_x = 0;
+  game.hitbox.pos_y = game.map_size - 2;
 
   // preparar la pieza
-  if (game_check_hitbox(&game.hitbox)){
+  if (game_check_hitbox(&(game.hitbox))){
     game.pieza = game.hitbox;
-    escribir_sprite(pieza->pos_y, pieza->form);
+    escribir_sprite(game.pieza.pos_y, game.pieza.form);
   }
   else{
     return false; // GAME OVER
@@ -174,29 +162,39 @@ bool game_new_piece(){
   return true;
 }
 
-void game_movement(/*unsigned input*/){
-  Pieza *hitbox;
-  Pieza *pieza;
+void game_movement(){
+  uint8_t JOYx = (uint8_t)get_JOYx();
+  bool JOYy = get_JOYy();
+  bool KEY = get_KEY();
+  game.hitbox.pos_x += JOYx;
+  game.hitbox.pos_y -= (JOYy)? 2 : 1;
+  if(KEY){
+    game.hitbox.rot++;
+    game.hitbox.rot = game.hitbox.rot % 4;
+  }
+  copiar_sprite(&(game.hitbox.form), &PIEZAS[game.hitbox.rot][game.hitbox.num]);
 
-  hitbox = &game.hitbox;
-  pieza = &game.pieza;
+  borrar_sprite(game.pieza.pos_y, game.pieza.form);
 
-  // por rellenar
-
-  if(game_check_hitbox(&game.hitbox)){
-
-    borrar_sprite(pieza->pos_y, pieza->form);
-
-    escribir_sprite(hitbox->pos_y, hitbox->form);
-
+  if(game_check_hitbox(&(game.hitbox)))
+  {
     game.pieza = game.hitbox;
   }else{
-    if(false){
-      // por rellenar
+    if(JOYy || KEY)
+    {
+      game.hitbox.pos_y++;
+
+      if(game_check_hitbox(&(game.hitbox)))
+      {
+        game.pieza = game.hitbox;
+      }else{
+        game.state = CHECKOUT;
+      }
     }else{
       game.state = CHECKOUT;
     }
   }
+  escribir_sprite(game.pieza.pos_y, game.pieza.form);
 }
 
 void game_checkout(){
@@ -252,6 +250,11 @@ bool game_play(){
       default:
         game_checkout();
     }
+    Serial.println("========================");
+    for(uint8_t i = 0; i < 3; i++){
+      Serial.println(game.pieza.form[i] | 0b100000000, BIN);
+    }
+    Serial.println(game.state);
   }
   return true;
 }

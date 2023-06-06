@@ -12,14 +12,14 @@ typedef struct {
 Cursor cursor;
 
 bool KEY_read() {
-  return (digitalRead(KEY) == LOW);
+  return (digitalRead(KEY_PIN) == LOW);
 }
 
 int JOYx_read(){
-  if (analogRead(JOYx) > 550){
+  if (analogRead(JOYx_PIN) > 550){
     return 1;
   }
-  else if (analogRead(JOYx) < 474){
+  else if (analogRead(JOYx_PIN) < 474){
     return -1;
   }
   else{
@@ -28,11 +28,11 @@ int JOYx_read(){
 }
 
 bool JOYy_read(){
-  return analogRead(JOYy) > 600;
+  return analogRead(JOYy_PIN) > 600;
 }
 
 void joy_setup() {
-  pinMode(KEY, INPUT_PULLUP);
+  pinMode(KEY_PIN, INPUT_PULLUP);
 }
 
 void informacion(){
@@ -42,15 +42,21 @@ void informacion(){
 }
 
 bool get_KEY(){
-  return cursor.pulsar;
+  bool retorn = cursor.pulsar;
+  cursor.pulsar = false;
+  return retorn;
 }
 
 bool get_JOYy(){
-  return cursor.doble;
+  bool retorn = cursor.doble;
+  cursor.doble = false;
+  return retorn;
 }
 
 int get_JOYx(){
-  return cursor.direccion;
+  int retorn = cursor.direccion;
+  cursor.direccion = 0;
+  return retorn;
 }
 
 #endif

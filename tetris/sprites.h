@@ -5,9 +5,9 @@
 
 typedef uint8_t sprite[3];
 
-void copiar_sprite(sprite * out, const sprite * in){
+void copiar_sprite(sprite * s_out, const sprite * s_in){
   for(uint8_t k = 0; k < 3; k++){
-    *out[k] = *in[k];
+    (*s_out)[k] = (*s_in)[k];
   }
 }
 
