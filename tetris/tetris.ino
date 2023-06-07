@@ -27,6 +27,8 @@ void setup()
 
   rep_setup(ZUMB_PIN, tema_principal, 140, 2);
 
+  controles_setup(KEY_PIN, JOYx_PIN, JOYy_PIN);
+
   game_setup(FPS);
 
   MD_setup();

@@ -159,7 +159,7 @@ const note tema_principal[] = {
   { 0, 0, 0 }  // Esto es para indicar que se ha acabado
 };
 
-const note tema_secundario = {
+const note tema_secundario[] = {
   // Primera frase
   {4, 2, 2},
   {4, 3, 2},
@@ -381,7 +381,9 @@ const note tema_secundario = {
   {0, 0, 2},
   {8, 2, 2},
   {0, 0, 2},
-}
+
+  {0, 0, 0}
+};
 
 const note pistas[2] = {&tema_principal, &tema_secundario};
 

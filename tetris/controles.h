@@ -4,12 +4,11 @@
 #include "Arduino.h"
 
 typedef struct {
-  int KEY = KEY_PIN;
-  int JOYx = JOYx_PIN;
-  int JOYy = JOYy_PIN;
+  int KEY;
+  int JOYx;
+  int JOYy;
 } Pines ;
 
-Pines pines
 typedef struct {
   int direccion;
   bool doble;
@@ -18,16 +17,24 @@ typedef struct {
 
 Cursor cursor;
 
+Pines pin;
+
+void controles_setup(int KEY, int JOYx, int JOYy){
+  pin.KEY = KEY;
+  pin.JOYx = JOYx;
+  pin.JOYy = JOYy;
+  pinMode(pin.KEY, INPUT_PULLUP);
+}
 
 bool KEY_read(){
-  return (digitalRead(pines.KEY) == LOW);
+  return (digitalRead(pin.KEY) == LOW);
 }
 
 int JOYx_read(){
-  if (analogRead(pines.JOYx) > 550){
+  if (analogRead(pin.JOYx) > 600){
     return 1;
   }
-  else if (analogRead(pines.JOYx) < 474){
+  else if (analogRead(pin.JOYx) < 400){
     return -1;
   }
   else{
@@ -36,20 +43,18 @@ int JOYx_read(){
 }
 
 bool JOYy_read(){
-  return analogRead(pines.JOYy) > 600;
-}
-
-void joy_setup() {
-  pinMode(pines.KEY, INPUT_PULLUP);
+  return analogRead(pin.JOYy) > 600;
 }
 
 void informacion(){
-  if (abs(cursor.direccion) > 3){
-    cursor.direccion /= 2;
-  }
-  cursor.direccion += JOYx_read();
   cursor.doble = cursor.doble || JOYy_read();
   cursor.pulsar = cursor.pulsar || KEY_read();
+
+  int J = JOYx_read();
+
+  if (J != 0){
+    cursor.direccion = J;
+  }
 }
 
 bool get_KEY(){

@@ -52,7 +52,7 @@ bool game_check_x_mov(sprite box, bool right){
     }
   } else { // izquierda
     for (uint8_t i = 0; i < 3; i++){
-      retorn = retorn && (box[i] < 128);
+      retorn = retorn && (box[i] < 0b10000000);
     }
   }
   return retorn;
@@ -77,7 +77,7 @@ void game_x_mov(Pieza *box){
         break;
       }
     }
-  } else 
+  } else if (box->pos_x < 0)
   {
     for (i = 0; i > box->pos_x; i--)
     {
