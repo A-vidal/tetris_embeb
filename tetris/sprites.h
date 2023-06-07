@@ -13,8 +13,8 @@ void copiar_sprite(sprite * s_out, const sprite * s_in){
 
 const uint8_t PANTALLA_INICIO[32] = {
     //Dibujo inicial 8x32
-    0b00000000,
     0b01111110,
+    0b00011000,
     0b00011000,
     0b00011000,
     0b00000000,
@@ -28,9 +28,10 @@ const uint8_t PANTALLA_INICIO[32] = {
     0b01111110,
     0b00011000,
     0b00011000,
+    0b00011000,
     0b00000000,
-    0b01111110,
 
+    0b01111110,
     0b01100110,
     0b01111110,
     0b01111000,
@@ -38,8 +39,8 @@ const uint8_t PANTALLA_INICIO[32] = {
     0b00000000,
     0b01111110,
     0b00011000,
+
     0b00011000,
-    
     0b01111110,
     0b00000000,
     0b01111110,
@@ -47,7 +48,6 @@ const uint8_t PANTALLA_INICIO[32] = {
     0b00011000,
     0b00001100,
     0b01111110,
-    0b00000000,
 };
 
 const uint8_t CUADRADO_JUEGO[8] = {
