@@ -4,6 +4,13 @@
 #include "Arduino.h"
 
 typedef struct {
+  int KEY = KEY_PIN;
+  int JOYx = JOYx_PIN;
+  int JOYy = JOYy_PIN;
+} Pines ;
+
+Pines pines
+typedef struct {
   int direccion;
   bool doble;
   bool pulsar;
@@ -11,15 +18,16 @@ typedef struct {
 
 Cursor cursor;
 
-bool KEY_read() {
-  return (digitalRead(KEY_PIN) == LOW);
+
+bool KEY_read(){
+  return (digitalRead(pines.KEY) == LOW);
 }
 
 int JOYx_read(){
-  if (analogRead(JOYx_PIN) > 550){
+  if (analogRead(pines.JOYx) > 550){
     return 1;
   }
-  else if (analogRead(JOYx_PIN) < 474){
+  else if (analogRead(pines.JOYx) < 474){
     return -1;
   }
   else{
@@ -28,11 +36,11 @@ int JOYx_read(){
 }
 
 bool JOYy_read(){
-  return analogRead(JOYy_PIN) > 600;
+  return analogRead(pines.JOYy) > 600;
 }
 
 void joy_setup() {
-  pinMode(KEY_PIN, INPUT_PULLUP);
+  pinMode(pines.KEY, INPUT_PULLUP);
 }
 
 void informacion(){
