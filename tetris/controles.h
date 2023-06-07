@@ -36,6 +36,9 @@ void joy_setup() {
 }
 
 void informacion(){
+  if (abs(cursor.direccion) > 3){
+    cursor.direccion /= 2;
+  }
   cursor.direccion += JOYx_read();
   cursor.doble = cursor.doble || JOYy_read();
   cursor.pulsar = cursor.pulsar || KEY_read();

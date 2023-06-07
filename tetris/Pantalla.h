@@ -66,9 +66,9 @@ void barrido_pantalla(uint8_t i, uint8_t max){
   uint8_t value;
   for(uint8_t k = i; k < max; k++){
     if (k + 1 == max){
-      value = 0;
+      value = 0b00000000;
     }else{
-      value = mx.getColumn(k);
+      value = mx.getColumn(k + 1);
     }
     mx.setColumn(k, value);
   }

@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #ifndef GAME
 #define GAME
 
@@ -12,7 +13,7 @@ enum game_fase{
 typedef struct {
   sprite form;
   int8_t pos_x; // posicion % 8
-  uint8_t pos_y; // posicion % map_size
+  int8_t pos_y; // posicion % map_size
   uint8_t rot; // rotacion % 4
   uint8_t num; // numero de pieza [0-6]
 } Pieza;
@@ -102,7 +103,7 @@ bool game_check_hitbox(Pieza *hitbox){
 
   copiar_sprite(&box, &(hitbox->form));
 
-  uint8_t pos_y = hitbox->pos_y;
+  int8_t pos_y = hitbox->pos_y;
 
   bool retorn = true;
 
@@ -117,6 +118,10 @@ bool game_check_hitbox(Pieza *hitbox){
     retorn = retorn && (box[0] == 0);
     retorn = retorn && ((leer_fila(game.map_size)     & box[0]) == 0);
     retorn = retorn && ((leer_fila(game.map_size - 1) & box[2]) == 0);
+  }
+  else if (pos_y < 0 || pos_y > game.map_size)
+  {
+    return false;
   }
   else{
     retorn = retorn && ((leer_fila(pos_y + 1) & box[0]) == 0);
@@ -135,10 +140,10 @@ bool game_new_piece(){
 
     borrar_sprite(27, PIEZAS[0][game.next]);
 
-    copiar_sprite(&(game.hitbox.form), &PIEZAS[0][game.next]);
+    game.hitbox.num = game.next;
 
   }else{
-    copiar_sprite(&(game.hitbox.form), &PIEZAS[0][random(7)]);
+    game.hitbox.num = random(7);
   }
 
   game.next = random(7);
@@ -163,10 +168,22 @@ bool game_new_piece(){
 }
 
 void game_movement(){
-  uint8_t JOYx = (uint8_t)get_JOYx();
+  int JOYx = get_JOYx();
   bool JOYy = get_JOYy();
   bool KEY = get_KEY();
-  game.hitbox.pos_x += JOYx;
+
+  Serial.print(JOYx);
+  Serial.print(", ");
+  Serial.print(JOYy);
+  Serial.print(", ");
+  Serial.print(KEY);
+  Serial.print(", ");
+
+  if(JOYx > 0){
+    game.hitbox.pos_x++;
+  }else if (JOYx < 0){
+    game.hitbox.pos_x--;
+  }
   game.hitbox.pos_y -= (JOYy)? 2 : 1;
   if(KEY){
     game.hitbox.rot++;
@@ -213,7 +230,7 @@ void game_checkout(){
 void game_fall(){
   game.state = CHECKOUT;
   for(uint8_t i = 0; i < game.map_size; i++){
-    if(leer_fila(i) == 0)
+    if(leer_fila(i) == 0b00000000)
     {
       barrido_pantalla(i, game.map_size);
       break;
@@ -249,10 +266,6 @@ bool game_play(){
 
       default:
         game_checkout();
-    }
-    Serial.println("========================");
-    for(uint8_t i = 0; i < 3; i++){
-      Serial.println(game.pieza.form[i] | 0b100000000, BIN);
     }
     Serial.println(game.state);
   }
