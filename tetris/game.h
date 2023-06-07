@@ -1,4 +1,3 @@
-#include "HardwareSerial.h"
 #ifndef GAME
 #define GAME
 
