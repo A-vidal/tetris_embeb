@@ -12,7 +12,7 @@ MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES
 
 //Limpiar pantalla
 void resetMD() {
-  mx.control(MD_MAX72XX::INTENSITY, MAX_INTENSITY / 2);
+  mx.control(MD_MAX72XX::INTENSITY, MAX_INTENSITY / 8);
   mx.control(MD_MAX72XX::UPDATE, MD_MAX72XX::ON);
   mx.clear();
 }
@@ -55,7 +55,7 @@ void borrar_sprite(uint8_t i, const sprite form){
   sprite pantalla = {mx.getColumn(i+1), mx.getColumn(i), mx.getColumn(i-1)};
   sprite box;
   for(uint8_t k = 0; k < 3; k++){
-    box[k] = pantalla[k] & (form[k] ^ 0b11111111);
+    box[k] = pantalla[k] & (~form[k]);
   }
   mx.setColumn(i+1, box[0]);
   mx.setColumn(i, box[1]);

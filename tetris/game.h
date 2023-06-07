@@ -5,6 +5,8 @@
 #include "Arduino.h"
 #include "sprites.h"
 
+#define POSx_DEF 3
+
 enum game_fase{
   NEW_PIECE, MOVEMENT, CHECKOUT, FALL
 };
@@ -35,6 +37,7 @@ void game_setup(uint8_t FPS, uint8_t map_size = 24){
   game.state = NEW_PIECE;
   game.map_size = map_size;
   game.next = 7;
+  randomSeed(millis());
 }
 
 void game_change_FPS(uint8_t FPS){
@@ -62,9 +65,9 @@ void game_x_mov(Pieza *box){
   uint8_t i;
   uint8_t j;
 
-  if (box->pos_x > 0) 
+  if (box->pos_x > POSx_DEF) 
   {
-    for (i = 0; i < box->pos_x; i++)
+    for (i = POSx_DEF; i < box->pos_x; i++)
     {
       if (game_check_x_mov(box->form, true))
       { // mover el sprite
@@ -77,9 +80,9 @@ void game_x_mov(Pieza *box){
         break;
       }
     }
-  } else if (box->pos_x < 0)
+  } else if (box->pos_x < POSx_DEF)
   {
-    for (i = 0; i > box->pos_x; i--)
+    for (i = POSx_DEF; i > box->pos_x; i--)
     {
       if (game_check_x_mov(box->form, false))
       { // mover el sprite
@@ -151,7 +154,7 @@ bool game_new_piece(){
 
   // preparar la hitbox
   game.hitbox.rot = 0;
-  game.hitbox.pos_x = 0;
+  game.hitbox.pos_x = POSx_DEF;
   game.hitbox.pos_y = game.map_size - 2;
 
   // preparar la pieza
